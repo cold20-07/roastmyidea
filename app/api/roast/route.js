@@ -82,9 +82,20 @@ export async function POST(request) {
     // Generate roast using Gemini
     let roastData;
     try {
+      console.log('Generating roast for idea:', trimmedIdea.substring(0, 100) + '...');
       roastData = await generateRoast(trimmedIdea);
+      console.log('Successfully generated roast');
     } catch (error) {
-      console.error('Gemini API error:', error);
+      console.error('Gemini API error:', error.message);
+      
+      // Check if it's an API key issue
+      if (error.message?.includes('API key') || error.message?.includes('authentication')) {
+        return handleCORS(NextResponse.json(
+          { error: "API configuration error. Please check the server logs." },
+          { status: 500 }
+        ));
+      }
+      
       return handleCORS(NextResponse.json(
         { error: "Oops! Our AI is taking a break. Try again in a moment." },
         { status: 500 }

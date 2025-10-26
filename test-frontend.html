@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend Test - RoastMyIdea</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .test { margin: 20px 0; padding: 15px; border: 2px solid #ddd; }
+        .success { border-color: #4CAF50; background: #f1f8f4; }
+        .error { border-color: #f44336; background: #fef1f0; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 RoastMyIdea Frontend Test</h1>
+    <p>Testing the app at: <strong>http://localhost:3000</strong></p>
+    
+    <button onclick="runTests()">Run All Tests</button>
+    
+    <div id="results"></div>
+    
+    <script>
+        async function runTests() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Running tests...</p>';
+            
+            const tests = [];
+            
+            // Test 1: Load homepage
+            tests.push(await testHomepage());
+            
+            // Test 2: Submit valid idea
+            tests.push(await testSubmitIdea());
+            
+            // Test 3: Load wall of ideas
+            tests.push(await testWallOfIdeas());
+            
+            // Display results
+            results.innerHTML = tests.join('');
+            
+            const passed = tests.filter(t => t.includes('success')).length;
+            const total = tests.length;
+            
+            results.innerHTML += `<h2>Results: ${passed}/${total} tests passed</h2>`;
+        }
+        
+        async function testHomepage() {
+            try {
+                const response = await fetch('http://localhost:3000');
+                const html = await response.text();
+                
+                if (response.ok && html.includes('ROAST MY IDEA')) {
+                    return `<div class="test success">
+                        <h3>✓ Test 1: Homepage loads</h3>
+                        <p>Status: ${response.status}</p>
+                        <p>Contains expected content: Yes</p>
+                    </div>`;
+                } else {
+                    return `<div class="test error">
+                        <h3>✗ Test 1: Homepage failed</h3>
+                        <p>Status: ${response.status}</p>
+                    </div>`;
+                }
+            } catch (error) {
+                return `<div class="test error">
+                    <h3>✗ Test 1: Homepage error</h3>
+                    <p>${error.message}</p>
+                </div>`;
+            }
+        }
+        
+        async function testSubmitIdea() {
+            try {
+                const testIdea = 'A mobile app that uses AI to help people learn new languages by having conversations with virtual native speakers. It adapts to your skill level and interests.';
+                
+                const response = await fetch('http://localhost:3000/api/roast', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idea: testIdea })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.roast && data.problems && data.problems.length === 10) {
+                    return `<div class="test success">
+                        <h3>✓ Test 2: Submit idea works</h3>
+                        <p>Status: ${response.status}</p>
+                        <p>Got roast: Yes (${data.roast.length} chars)</p>
+                        <p>Got problems: ${data.problems.length}/10</p>
+                        <p>Roast ID: ${data.id}</p>
+                    </div>`;
+                } else {
+                    return `<div class="test error">
+                        <h3>✗ Test 2: Submit idea failed</h3>
+                        <p>Status: ${response.status}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>`;
+                }
+            } catch (error) {
+                return `<div class="test error">
+                    <h3>✗ Test 2: Submit idea error</h3>
+                    <p>${error.message}</p>
+                </div>`;
+            }
+        }
+        
+        async function testWallOfIdeas() {
+            try {
+                const response = await fetch('http://localhost:3000/api/ideas?limit=10');
+                const data = await response.json();
+                
+                if (response.ok && data.ideas && data.ideas.length > 0) {
+                    return `<div class="test success">
+                        <h3>✓ Test 3: Wall of ideas works</h3>
+                        <p>Status: ${response.status}</p>
+                        <p>Ideas loaded: ${data.ideas.length}</p>
+                        <p>First idea: ${data.ideas[0].ideaSnippet.substring(0, 80)}...</p>
+                    </div>`;
+                } else {
+                    return `<div class="test error">
+                        <h3>✗ Test 3: Wall of ideas failed</h3>
+                        <p>Status: ${response.status}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>`;
+                }
+            } catch (error) {
+                return `<div class="test error">
+                    <h3>✗ Test 3: Wall of ideas error</h3>
+                    <p>${error.message}</p>
+                </div>`;
+            }
+        }
+    </script>
+</body>
+</html>
