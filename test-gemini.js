@@ -1,9 +1,9 @@
 // Test script to verify Gemini API is working
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Load env vars manually
-const GOOGLE_GEMINI_API_KEY = 'AIzaSyBWNQuItTpZnmK2pqkvg9F7LrBGhTj4ms4';
-const GEMINI_MODEL = 'gemini-2.0-flash-exp';
+// Load env vars manually - REPLACE WITH YOUR ACTUAL VALUES
+const GOOGLE_GEMINI_API_KEY = 'YOUR_API_KEY_HERE';
+const GEMINI_MODEL = 'YOUR_MODEL_NAME_HERE';
 
 async function testGemini() {
   try {
