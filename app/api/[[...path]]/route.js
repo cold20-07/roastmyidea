@@ -220,30 +220,43 @@ async function handleGetRoastById(request, id) {
 
 // Main GET handler
 async function handleGET(request, { params }) {
-  const { path = [] } = params;
-  const route = `/${path.join('/')}`;
-  
-  if (route === '/' || route === '/ideas') {
-    return handleGetIdeas(request);
-  }
-  
-  if (path[0] === 'roast' && path[1]) {
-    return handleGetRoastById(request, path[1]);
-  }
+  try {
+    const { path = [] } = params || {};
+    console.log('GET request, path:', path);
+    
+    // Handle /api/ideas or /api/
+    if (path.length === 0 || path[0] === 'ideas') {
+      return handleGetIdeas(request);
+    }
+    
+    // Handle /api/roast/:id
+    if (path[0] === 'roast' && path[1]) {
+      return handleGetRoastById(request, path[1]);
+    }
 
-  return handleCORS(NextResponse.json({ error: 'Not found' }, { status: 404 }));
+    return handleCORS(NextResponse.json({ error: 'Not found', path }, { status: 404 }));
+  } catch (error) {
+    console.error('Error in handleGET:', error);
+    return handleCORS(NextResponse.json({ error: error.message }, { status: 500 }));
+  }
 }
 
 // Main POST handler
 async function handlePOST(request, { params }) {
-  const { path = [] } = params;
-  const route = `/${path.join('/')}`;
-  
-  if (route === '/' || route === '/roast') {
-    return handleRoastPost(request);
-  }
+  try {
+    const { path = [] } = params || {};
+    console.log('POST request, path:', path);
+    
+    // Handle /api/roast or /api/
+    if (path.length === 0 || path[0] === 'roast') {
+      return handleRoastPost(request);
+    }
 
-  return handleCORS(NextResponse.json({ error: 'Not found' }, { status: 404 }));
+    return handleCORS(NextResponse.json({ error: 'Not found', path }, { status: 404 }));
+  } catch (error) {
+    console.error('Error in handlePOST:', error);
+    return handleCORS(NextResponse.json({ error: error.message }, { status: 500 }));
+  }
 }
 
 // Export all HTTP methods
