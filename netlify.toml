@@ -4,17 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  # Disable secrets scanning for documentation files
   SECRETS_SCAN_ENABLED = "false"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-[functions]
-  # Increase timeout for API routes (max 26 seconds on free tier)
-  node_bundler = "esbuild"
-  
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200

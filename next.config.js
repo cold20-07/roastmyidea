@@ -1,5 +1,5 @@
 const nextConfig = {
-  output: 'standalone',
+  // Remove 'standalone' for Netlify - let @netlify/plugin-nextjs handle it
   images: {
     unoptimized: true,
   },
